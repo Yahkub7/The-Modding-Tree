@@ -7,20 +7,27 @@ let modInfo = {
 
 	discordName: "",
 	discordLink: "",
-	initialStartPoints: new Decimal (10), // Used for hard resets and new players
+	initialStartPoints: new Decimal (9), // Used for hard resets and new players
 	offlineLimit: 1,  // In hours
 }
 
 // Set your version in num and name
 let VERSION = {
 	num: "0.0",
-	name: "Literally nothing",
+	name: "Can I get one layer to work?",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
 	<h3>v0.0</h3><br>
 		- Added things.<br>
-		- Added stuff.`
+		- Broke things.
+		- Tried to make one layer work.
+		- I don't know any coding so this is just a logic puzzle
+		- Do you know how long it took to find out how to raise gain to a power?
+		- It was too long. Way too long. I google'd it, I tried everything I could think of.
+		- Then, then after a week, I had the bright idea to look at someone else's mod.
+		- Why didn't I do that earlier? Cause I'm stupid.
+		- This logic puzzle is going to be hard.`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -43,7 +50,7 @@ function getPointGen() {
 		return new Decimal(0)
 		
 	let gain = new Decimal(1)
-	if (hasUpgrade('C', 11)) gain = gain.times(2)
+	if (hasUpgrade('C', 11)) gain = gain.pow(2)
 	if (hasUpgrade('C', 12)) gain = gain.times(upgradeEffect('C', 12))
 	return gain
 }

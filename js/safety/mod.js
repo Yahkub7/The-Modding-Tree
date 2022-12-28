@@ -18,15 +18,6 @@ let VERSION = {
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.0.1</h3><br>
-		- 4 upgrades that work.<br>
-		- Boring Achievements.<br>
-		- A secret achievement for people bad at math.<br>
-		- Cost scaling on upgrades.<br>
-		- Static layer progression.<br>
-		- Fight me. I know both of these are not always good.<br>
-		- I did this on purpose to make the choice of upgrade order matter.<br>
-		- I probably failed at that though... Maybe don't fight me.<br>
 	<h3>v0.0</h3><br>
 		- Added things.<br>
 		- Broke things.<br>

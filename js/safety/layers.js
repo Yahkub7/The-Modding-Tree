@@ -35,13 +35,7 @@ addLayer("C", {
         11: {
             title: "Belief",
             description: "Double your Faith gain.",
-            cost() {
-                let cost = new Decimal(2)
-                if (hasUpgrade("C",11)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",12)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",13)) cost = cost.mul(1.5)
-                return cost
-            },
+            cost: new Decimal(2),
             effectDisplay() {
                 return "2x"
             },
@@ -49,13 +43,7 @@ addLayer("C", {
         12: {
             title: "Prayer",
             description: "Square your Faith gain.",
-            cost() {
-                let cost = new Decimal(2)
-                if (hasUpgrade("C",11)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",12)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",13)) cost = cost.mul(1.5)
-                return cost
-            },
+            cost: new Decimal(2),
             effectDisplay() {
                 return "x^2"
             },
@@ -63,13 +51,7 @@ addLayer("C", {
         13: {
             title: "Zeal",
             description: "Multiply Faith gain by 1+log10(Best Conviction)",
-            cost() {
-                let cost = new Decimal(2)
-                if (hasUpgrade("C",11)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",12)) cost = cost.mul(1.5)
-                if (hasUpgrade("C",13)) cost = cost.mul(1.5)
-                return cost
-            },
+            cost: new Decimal(2),
             effect() {
                 let Eff  = new Decimal(1)
                 Eff = Eff.add(player.C.best)
@@ -80,14 +62,6 @@ addLayer("C", {
             effectDisplay() {
                 return format(upgradeEffect("C",13)) + "x"
             },
-        },
-        14: {
-            fullDisplay: "<-",
-            canAfford: false,
-        },
-        15: {
-            fullDisplay: "Each Increases Cost By 1.5x",
-            canAfford: false,
         },
         21: {
             title: "Flagellation",
@@ -144,7 +118,7 @@ addLayer("A", {
                 return getPointGen()<1
             },
             onComplete() {
-                addPoints("A",10)
+                addPoints("A",1)
             }
         },
         21: {
@@ -224,4 +198,7 @@ addLayer("Ch", {
         return new Decimal(1)
     },
     layerShown() { return true },          // Returns a bool for if this layer's node should be visible in the tree.
+    upgrades: {
+        // Look in the upgrades docs to see what goes here!
+    },
 })

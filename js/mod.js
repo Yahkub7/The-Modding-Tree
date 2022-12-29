@@ -3,7 +3,7 @@ let modInfo = {
 	id: "cult1337",
 	author: "Neutral",
 	pointsName: "Faith",
-	modFiles: ["layers.js", "tree.js"],
+	modFiles: ["layers.js","tree.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -13,13 +13,14 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0",
+	num: "0.0.1",
 	name: "Can I get one layer to work?",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
-	<h3>v0.0.1</h3><br>
+	<br><h3>v0.0.1</h3><br>
 		- 4 upgrades that work.<br>
+		- If you use "best: true," you can spend an hour trying to figure out why in the world it doesn't work on reset.<br>
 		- Boring Achievements.<br>
 		- A secret achievement for people bad at math.<br>
 		- Cost scaling on upgrades.<br>
@@ -27,7 +28,8 @@ let changelog = `<h1>Changelog:</h1><br>
 		- Fight me. I know both of these are not always good.<br>
 		- I did this on purpose to make the choice of upgrade order matter.<br>
 		- I probably failed at that though... Maybe don't fight me.<br>
-	<h3>v0.0</h3><br>
+		- Now to break some more things.<br>
+	<br><h3>v0.0</h3><br>
 		- Added things.<br>
 		- Broke things.<br>
 		- Tried to make one layer work.<br>
@@ -56,8 +58,7 @@ function canGenPoints() {
 // Calculate points/sec!
 function getPointBase() {
 	let base = new Decimal(0.5)
-	if (hasAchievement("A",11)) base = base.add(0.1)
-	base = base.add(tmp.A.effect)
+	base = base.add(player.points)
 	return base
 }
 function getPointMult() {
@@ -68,7 +69,9 @@ function getPointMult() {
 }
 function getPointExp() {
 	let exp = new Decimal(1)
-	if (hasUpgrade("C",12)) exp = exp.add(1)
+	if (hasUpgrade("C",12)) exp = exp.add(0.5)
+	if (hasUpgrade("C",22)) exp = exp.add(0.75)
+	if (hasUpgrade("C",32)) exp = exp.add(1)
 	return exp
 }
 function getPointGen() {
@@ -79,10 +82,13 @@ function getPointGen() {
 }
 function getDegen() {
 	let degen = new Decimal(0.10)
-	if (hasUpgrade("C",21)) degen = degen.minus(0.05)
+	if (hasUpgrade("C",21)) degen = degen.div(2)
+	if (hasUpgrade("C",31)) degen = degen.div(4)
 	return degen
 }
-
+function update(diff) {
+	player.points = player.points.minus(player.points.mul(getDegen()).mul(diff))
+}
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
 }}

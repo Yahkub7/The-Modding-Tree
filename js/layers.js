@@ -8,7 +8,7 @@ addLayer("C", {
         best: new Decimal(0),
     }},
     color: "#4BDC13",
-    requires: new Decimal(1.5), // Can be a function that takes requirement increases into account
+    requires: new Decimal(1), // Can be a function that takes requirement increases into account
     resource: "Conviction", // Name of prestige currency
     baseResource: "Faith", // Name of resource prestige is based on
     baseAmount() {return player.points}, // Get the current amount of baseResource
@@ -22,7 +22,7 @@ addLayer("C", {
     directMult() {
         let mult = new Decimal(1)
         if (hasUpgrade("C", 33)) mult = mult.times(upgradeEffect("C",33))
-        mult = mult
+        mult = mult.mul(tmp.G.effect)
         return mult
     },
     gainMult() {
@@ -41,8 +41,9 @@ addLayer("C", {
     update(diff) {
         player.points = player.points.minus(player.points.mul(getDegen()).mul(diff))
     },
-    resetsNothing() { if (hasAchievement("A",26)) return true},
-    autoPrestige() { if (hasAchievement("A",26)) return true},
+    resetsNothing() { if (hasAchievement("A",26)) return true }, //Works Fine
+    autoPrestige() { if (hasAchievement("A",26)) return true }, //Works Fine
+    autoUpgrade() { if (hasAchievement("A",36)) return true }, //Breaks Everything
     upgrades: {
         11: {
             title: "Belief",
@@ -70,7 +71,7 @@ addLayer("C", {
         },
         13: {
             title: "Zeal",
-            description: "Multiply Faith gain by 1+ln(Best Conviction)",
+            description: "Multiply Faith gain by 1+log2(Best Conviction)",
             cost() {
                 let cost = new Decimal(2)
                 cost = cost.mul(upgradeEffect("C",15))
@@ -79,7 +80,7 @@ addLayer("C", {
             effect() {
                 let Eff  = new Decimal(1)
                 Eff = Eff.add(player.C.best)
-                Eff = Eff.ln()
+                Eff = Eff.log2()
                 Eff = Eff.max(1)
                 return Eff
             },
@@ -145,7 +146,7 @@ addLayer("C", {
         },
         31: {
             title: "31",
-            description: "Quarter your Faith lost to inaction",
+            description: "Double your base Faith gain",
             cost() {
                 let cost = new Decimal(100)
                 cost = cost.mul(upgradeEffect("C",35))
@@ -205,6 +206,19 @@ addLayer("C", {
                 return unl
             },
         },
+        42: {
+            title: "Burnt Offering",
+            description: "Automate buying Conviction upgrades",
+            cost: new Decimal(1000),
+            currencyDisplayName: "Gold",
+            currencyInternalName: "points",
+            currencyLayer: "G",
+            unlocked() {
+                let unl = true
+                if (hasAchievement("A",36)) unl = false
+                return unl
+            },
+        },
 }}),
 addLayer("A", {
     name: "Achievements", // This is optional, only used in a few places, If absent it just uses the layer id.
@@ -251,7 +265,7 @@ addLayer("A", {
                 return getPointGen()<1
             },
             onComplete() {
-                addPoints("A",10)
+                addPoints("A",20)
             }
         },
         12: {
@@ -261,10 +275,10 @@ addLayer("A", {
             },
             done() {
                 if (hasUpgrade("C",12))
-                return getPointGen().minus(player.points.mul(getDegen())).mag<=0.01
+                return getPointGen().minus(player.points.mul(getDegen())).mag<=0.1
             },
             onComplete() {
-                addPoints("A",10)
+                addPoints("A",20)
             }
         },
         21: {
@@ -329,14 +343,34 @@ addLayer("A", {
                 addPoints("A",1)
             }
         },
+        36: {
+            name: "Auto-Conviction Upgrades",
+            doneTooltip: "Read the title",
+            unlocked() {if (hasAchievement("A",36)) return true
+            },
+            done() {
+                return hasUpgrade("C",42)
+            },
+            onComplete() {
+                addPoints("A",1)
+            }
+        },
     }
 }),
 
 addLayer("G", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
-        unlocked: true,                     // You can add more variables here to add them to your layer.
-        points: new Decimal(100),             // "points" is the internal name for the main resource of the layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        unlocked: false,
         rec: new Decimal(0),
+        bought1: new Decimal(0),
+        bought2: new Decimal(0),
+        bought3: new Decimal(0),
+        bought4: new Decimal(0),
+        bought5: new Decimal(0),
+        bought6: new Decimal(0),
+        bought7: new Decimal(0),
+        bought8: new Decimal(0),
     }},
     color: "#4BDC13",                       // The color for this layer, which affects many elements.
     resource: "Gold",                       // The name of this layer's main prestige resource.
@@ -344,12 +378,12 @@ addLayer("G", {
     position: 0,
     baseResource: "Conviction",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.C.points },  // A function to return the current amount of baseResource.
-    requires: new Decimal(600),               // The amount of the base needed to  gain 1 of the prestige currency. 
+    requires: new Decimal(800),               // The amount of the base needed to  gain 1 of the prestige currency. 
                                             // Also the amount required to unlock the layer.
     type: "normal",                         // Determines the formula used for calculating prestige currency.
-    exponent: 5,                          // "normal" prestige gain is (currency^exponent).
+    exponent: 2,                          // "normal" prestige gain is (currency^exponent).
     hotkeys: [
-        {key: "h", description: "h: Reset for church gold", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "g", description: "g: Reset for church gold", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
         return new Decimal(1)               // Factor in any bonuses multiplying gain here.
@@ -359,64 +393,167 @@ addLayer("G", {
     },
     layerShown() {
         let shown = false
-        if(player.C.total.gte(800)) shown = true
+        if(player.C.total.gte(500)) shown = true
         if(player.G.unlocked) shown = true
         return shown
     },
     effect() {
-        let eff = new Decimal(1)
+        let eff = new Decimal(0)
         eff = eff.add(player.G.rec)
-        eff = eff.log10()
+        eff = eff.min(populationLimit())
+        eff = eff.div(100)
+        eff = eff.add(1)
+        eff = eff.pow(0.25)
         return eff
     },
     effectDescription() {
-        return "<br>you have recruited "+format(player.G.rec)+" people into your cult,"+
-                "<br>your cult increases Conviction gain by "+this.effect()+"%"
+        let dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>your cult increases Conviction gain by "+format(this.effect().minus(1).mul(100))+"%"
+        if (player.G.rec >= populationLimit()) 
+            dis = "<br>you have recruited "+format(player.G.rec)+" people into your cult,<br>which is everyone,<br>your cult increases Conviction gain by "+format(this.effect().minus(1).mul(100))+"%"
+        return dis
     },
+
     update(diff) {
-            player.G.rec = player.G.rec.add((getBuyableAmount(this.layer, 11)).times(diff))
-            player.G.buyables[11] = player.G.buyables[11].add(player.G.buyables[12].mul(diff))
-
-
+            player.G.rec = player.G.rec.add((buyableEffect(this.layer, 11)).times(diff))
+            player.G.buyables[11] = player.G.buyables[11].add(buyableEffect(this.layer, 12).mul(diff))
+            player.G.buyables[12] = player.G.buyables[12].add(buyableEffect(this.layer, 21).mul(diff))
+            player.G.buyables[21] = player.G.buyables[21].add(buyableEffect(this.layer, 22).mul(diff))
+            //player.G.buyables[22] = player.G.buyables[22].add(player.G.buyables[31].mul(diff).div(30))
+            //player.G.buyables[31] = player.G.buyables[31].add(player.G.buyables[32].mul(diff).div(45))
+            //player.G.buyables[32] = player.G.buyables[32].add(player.G.buyables[41].mul(diff).div(60))
+            //player.G.buyables[41] = player.G.buyables[41].add(player.G.buyables[42].mul(diff).div(120))
+            if (player.G.rec.gte(populationLimit())) player.G.rec = populationLimit()
     },
     buyables: {
         11: {
-            cost(x) { return new Decimal(2).pow(x) },
+            cost() { return new Decimal(2).pow(player[this.layer].bought1) },
             display() { return "Disciple"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Citizens/second"+
                                 "<br>"+
+                                "<br> you have bought "+player[this.layer].bought1+
                                 "<br>The next costs "+format((this.cost()))+" gold" },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player[this.layer].bought1 = player[this.layer].bought1.add(1)
             },
             effect() {
                 let eff = new Decimal(1)
+                eff = eff.mul(player[this.layer].bought1)
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 return eff
             },
         },
         12: {
-            cost(x) { return new Decimal(3).pow(x).add(9) },
+            cost() { return new Decimal(3).pow(player[this.layer].bought2.add(3)) },
             display() { return "Acolyte"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Disciples/second"+
                                 "<br>"+
+                                "<br> you have bought "+player[this.layer].bought2+
                                 "<br>The next costs "+format((this.cost()))+" gold" },
             canAfford() { return player[this.layer].points.gte(this.cost()) },
             buy() {
                 player[this.layer].points = player[this.layer].points.sub(this.cost())
                 setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player[this.layer].bought2 = player[this.layer].bought2.add(1)
             },
             effect() {
                 let eff = new Decimal(1)
+                eff = eff.mul(player[this.layer].bought2)
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
+                eff = eff.div(3)
                 return eff
             },
         },
+        21: {
+            cost() { return new Decimal(5).pow(player[this.layer].bought3.add(5)) },
+            display() { return "Priest"+
+                                "<br>"+
+                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+                                "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Acolytes/second"+
+                                "<br>"+
+                                "<br> you have bought "+player[this.layer].bought3+
+                                "<br>The next costs "+format((this.cost()))+" gold" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player[this.layer].bought3 = player[this.layer].bought3.add(1)
+            },
+            effect() {
+                let eff = new Decimal(1)
+                eff = eff.mul(player[this.layer].bought3)
+                eff = eff.mul(getBuyableAmount(this.layer, this.id))
+                eff = eff.div(9)
+                return eff
+            },
+        },
+        22: {
+            cost() { return new Decimal(7).pow(player[this.layer].bought4.add(5)) },
+            display() { return "Bishop"+
+                                "<br>"+
+                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+                                "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Priests/second"+
+                                "<br>"+
+                                "<br> you have bought "+player[this.layer].bought4+
+                                "<br>The next costs "+format((this.cost()))+" gold" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+                player[this.layer].bought4 = player[this.layer].bought4.add(1)
+            },
+            effect() {
+                let eff = new Decimal(1)
+                eff = eff.mul(player[this.layer].bought4)
+                eff = eff.mul(getBuyableAmount(this.layer, this.id))
+                eff = eff.div(15)
+                return eff
+            },
+        },
+        }
     }
+),
+addLayer("ghost", {
+    layerShown: "ghost",
+    row: 1,
+    position: 1,
+}),
+addLayer("S", {
+    startData() { return {                  // startData is a function that returns default data for a layer. 
+        unlocked: true,                     // You can add more variables here to add them to your layer.
+        points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+    }},
+
+    color: "#4BDC13",                       // The color for this layer, which affects many elements.
+    resource: "prestige points",            // The name of this layer's main prestige resource.
+    row: 1,                                 // The row this layer is on (0 is the first row).
+    position: 2,
+
+    baseResource: "points",                 // The name of the resource your prestige gain is based on.
+    baseAmount() { return player.points },  // A function to return the current amount of baseResource.
+
+    requires: new Decimal(10),              // The amount of the base needed to  gain 1 of the prestige currency.
+                                            // Also the amount required to unlock the layer.
+
+    type: "normal",                         // Determines the formula used for calculating prestige currency.
+    exponent: 0.5,                          // "normal" prestige gain is (currency^exponent).
+
+    gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
+        return new Decimal(1)               // Factor in any bonuses multiplying gain here.
+    },
+    gainExp() {                             // Returns the exponent to your gain of the prestige resource.
+        return new Decimal(1)
+    },
+
+    layerShown() { return true },          // Returns a bool for if this layer's node should be visible in the tree.
+
+    upgrades: {
+        // Look in the upgrades docs to see what goes here!
+    },
 })

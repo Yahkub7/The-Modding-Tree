@@ -55,18 +55,23 @@ function canGenPoints() {
 	return false
 }
 
-// Calculate points/sec!
+// To be used to get the base points/sec
 function getPointBase() {
 	let base = new Decimal(0.5)
 	base = base.mul(tmp.A.effect)
+	if (hasUpgrade("C",31)) base = base.add(0.5)
 	return base
 }
+
+// To be used to get the multiplier of base points/sec
 function getPointMult() {
 	let mult = new Decimal(1)
 	if (hasUpgrade("C",11)) mult = mult.add(1)
 	if (hasUpgrade("C",13)) mult = mult.mul(upgradeEffect("C",13))
 	return mult
 }
+
+// To be used to get the exponent of base points/sec
 function getPointExp() {
 	let exp = new Decimal(1)
 	if (hasUpgrade("C",12)) exp = exp.add(0.5)
@@ -74,21 +79,33 @@ function getPointExp() {
 	if (hasUpgrade("C",32)) exp = exp.add(1)
 	return exp
 }
+
+// Calculate points/sec! I made this (base*mult)^exp for my sanity. No other good reason to mess with it.
 function getPointGen() {
 	let gain = getPointBase()
 	gain = gain.mul(getPointMult())
 	gain = gain.pow(getPointExp())
 	return gain
 }
+
+// Determines the percent of total player.points lost per second. Doesn't work very well with higher numbers, never seems to cap.
 function getDegen() {
-	let degen = new Decimal(0.10)
+	let degen = new Decimal(0.20)
 	if (hasUpgrade("C",21)) degen = degen.div(2)
-	if (hasUpgrade("C",31)) degen = degen.div(4)
 	return degen
 }
+
+// Actually does the subtracting.
 function update(diff) {
 	player.points = player.points.minus(player.points.mul(getDegen()).mul(diff))
 }
+
+// Determines the population you can recruit. I intend to add the ability to find planets. Good luck to me!
+function populationLimit() {
+	let pop = new Decimal(7.837e9)
+	return pop
+}
+
 // You can add non-layer related variables that should to into "player" and be saved here, along with default values
 function addedPlayerData() { return {
 }}
@@ -98,7 +115,7 @@ var displayThings = [
 	function() {
 		let dis = getPointGen()
 		dis = dis.minus(player.points.mul(getDegen()))
-		dis = "("+format(dis)+") Net F/s<br> You lose " + getDegen().mul(100) + "% of your total Faith per second"
+		dis = "("+format(dis)+") Net F/s<br>You lose " + getDegen().mul(100) + "% of your total Faith per second"
 		return "(" + format(getPointGen()) + ")" + " Gross F/s<br>"+dis
 	}
 ]

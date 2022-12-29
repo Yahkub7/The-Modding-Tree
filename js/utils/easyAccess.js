@@ -34,6 +34,18 @@ function addBuyables(layer, id, amt) {
 	player[layer].buyables[id] = player[layer].buyables[id].add(amt)
 }
 
+function getBuyableBought(layer, id) {
+	return (player[layer].buyables[id].bought)
+}
+
+function setBuyableBought(layer, id, amt) {
+	player[layer].buyables[id].bought = amt
+}
+
+function addBuyableBought(layer, id, amt) {
+	player[layer].buyables[id].bought = player[layer].buyables[id].add(amt)
+}
+
 function getClickableState(layer, id) {
 	return (player[layer].clickables[id])
 }

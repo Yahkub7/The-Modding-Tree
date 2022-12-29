@@ -314,7 +314,7 @@ VERSION.withName = VERSION.withoutName + (VERSION.name ? ": " + VERSION.name : "
 function autobuyUpgrades(layer){
 	if (!tmp[layer].upgrades) return
 	for (id in tmp[layer].upgrades)
-		if (isPlainObject(tmp[layer].upgrades[id]) && (layers[layer].upgrades[id].canAfford === undefined || layers[layer].upgrades[id].canAfford() === true))
+		if (isPlainObject(tmp[layer].upgrades[id]) && (layers[layer].upgrades[id].canAfford === undefined || layers[layer].upgrades[id].canAfford === true))
 			buyUpg(layer, id) 
 }
 

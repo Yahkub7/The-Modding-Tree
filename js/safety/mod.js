@@ -58,7 +58,7 @@ function canGenPoints() {
 // Calculate points/sec!
 function getPointBase() {
 	let base = new Decimal(0.5)
-	base = base.mul(tmp.A.effect)
+	base = base.add(player.points)
 	return base
 }
 function getPointMult() {

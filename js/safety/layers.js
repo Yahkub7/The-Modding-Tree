@@ -22,7 +22,7 @@ addLayer("C", {
     directMult() {
         let mult = new Decimal(1)
         if (hasUpgrade("C", 33)) mult = mult.times(upgradeEffect("C",33))
-        mult = mult
+        mult = mult.mul(layerEffect("G"))
         return mult
     },
     gainMult() {
@@ -77,10 +77,10 @@ addLayer("C", {
                 return cost
             },
             effect() {
-                let Eff  = new Decimal(1)
+                let Eff  = new Decimal(0)
                 Eff = Eff.add(player.C.best)
                 Eff = Eff.ln()
-                Eff = Eff.max(1)
+                Eff = Eff.add(1)
                 return Eff
             },
             effectDisplay() {
@@ -231,11 +231,11 @@ addLayer("A", {
     effect(){
         let acheff = player[this.layer].points.add(1)
         acheff = acheff.log10()
-        acheff = acheff.max(1)
+        acheff = acheff.div(10)
         return acheff
     },
     effectDescription() {
-        let dis = "<br> which multiplies base Faith gain by " + format(tmp.A.effect)
+        let dis = "<br> which boosts base Faith gain by " + format(tmp.A.effect)
         return dis
     },
     achievements: {
@@ -261,7 +261,7 @@ addLayer("A", {
             },
             done() {
                 if (hasUpgrade("C",12))
-                return getPointGen().minus(player.points.mul(getDegen())).mag<=0.01
+                return player.points>=4.65
             },
             onComplete() {
                 addPoints("A",10)
@@ -347,7 +347,7 @@ addLayer("G", {
     requires: new Decimal(600),               // The amount of the base needed to  gain 1 of the prestige currency. 
                                             // Also the amount required to unlock the layer.
     type: "normal",                         // Determines the formula used for calculating prestige currency.
-    exponent: 5,                          // "normal" prestige gain is (currency^exponent).
+    exponent: 0.9,                          // "normal" prestige gain is (currency^exponent).
     hotkeys: [
         {key: "h", description: "h: Reset for church gold", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],

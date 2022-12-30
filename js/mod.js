@@ -18,6 +18,15 @@ let VERSION = {
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.2</h3><br>
+		- Now 11 upgrades work as intended<br>
+		- Automation of first layer exists.<br>
+		- Second layer implemented (badly).<br>
+		- Game is sort of psuedo balanced for about 10 minutes.<br>
+		- Probably going to break that when I get the third layer working.<br>
+		- To-Do: Figure out mechanics that are interesting for more layers.<br>
+		- To-Do: Space! Magic! Necromancy?<br>
+		- To-Do: Vampires and were-wolves and other things could be cool...<br>
 	<br><h3>v0.0.1</h3><br>
 		- 4 upgrades that work.<br>
 		- If you use "best: true," you can spend an hour trying to figure out why in the world it doesn't work on reset.<br>

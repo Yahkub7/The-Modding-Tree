@@ -41,9 +41,9 @@ addLayer("C", {
     update(diff) {
         player.points = player.points.minus(player.points.mul(getDegen()).mul(diff))
     },
-    resetsNothing() { if (hasAchievement("A",26)) return true }, //Works Fine
-    autoPrestige() { if (hasAchievement("A",26)) return true }, //Works Fine
-    autoUpgrade() { if (hasAchievement("A",36)) return true }, //Breaks Everything
+    resetsNothing() { return hasAchievement("A",26) }, //Works Fine
+    autoPrestige() { return hasAchievement("A",26) }, //Works Fine
+    autoUpgrade() { return hasAchievement("A",36) }, //Works now that I changed line 317 in game.js, Gotta keep an eye on this.
     upgrades: {
         11: {
             title: "Belief",
@@ -372,10 +372,11 @@ addLayer("G", {
         bought7: new Decimal(0),
         bought8: new Decimal(0),
     }},
-    color: "#4BDC13",                       // The color for this layer, which affects many elements.
+    color: "#a413dc",                       // The color for this layer, which affects many elements.
     resource: "Gold",                       // The name of this layer's main prestige resource.
     row: 1,                                 // The row this layer is on (0 is the first row).
     position: 0,
+    branches: ["C"],
     baseResource: "Conviction",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.C.points },  // A function to return the current amount of baseResource.
     requires: new Decimal(800),               // The amount of the base needed to  gain 1 of the prestige currency. 
@@ -524,35 +525,40 @@ addLayer("ghost", {
     row: 1,
     position: 1,
 }),
-addLayer("S", {
+addLayer("K", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
-        unlocked: true,                     // You can add more variables here to add them to your layer.
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
+        unlocked: false,
     }},
-
-    color: "#4BDC13",                       // The color for this layer, which affects many elements.
-    resource: "prestige points",            // The name of this layer's main prestige resource.
+    color: "#dca413",                       // The color for this layer, which affects many elements.
+    resource: "Chi",                       // The name of this layer's main prestige resource.
     row: 1,                                 // The row this layer is on (0 is the first row).
     position: 2,
-
-    baseResource: "points",                 // The name of the resource your prestige gain is based on.
-    baseAmount() { return player.points },  // A function to return the current amount of baseResource.
-
-    requires: new Decimal(10),              // The amount of the base needed to  gain 1 of the prestige currency.
+    branches: ["C"],
+    baseResource: "Conviction",                 // The name of the resource your prestige gain is based on.
+    baseAmount() { return player.C.points },  // A function to return the current amount of baseResource.
+    requires: new Decimal(1e800),               // The amount of the base needed to  gain 1 of the prestige currency. 
                                             // Also the amount required to unlock the layer.
-
     type: "normal",                         // Determines the formula used for calculating prestige currency.
-    exponent: 0.5,                          // "normal" prestige gain is (currency^exponent).
-
+    exponent: 2,                          // "normal" prestige gain is (currency^exponent).
+    hotkeys: [
+        {key: "K", description: "k: Reset for Chi", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+    ],
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
         return new Decimal(1)               // Factor in any bonuses multiplying gain here.
     },
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
-
-    layerShown() { return true },          // Returns a bool for if this layer's node should be visible in the tree.
-
+    layerShown() {
+        let shown = false
+        if(player.C.total.gte(500)) shown = true
+        if(player.K.unlocked) shown = true
+        return shown
+    },
+    effectDescription() {
+        return "<br><h3>I don't do anything yet so please ignore me<h3>"
+    },
     upgrades: {
         // Look in the upgrades docs to see what goes here!
     },

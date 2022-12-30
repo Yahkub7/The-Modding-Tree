@@ -44,6 +44,28 @@ addLayer("C", {
     resetsNothing() { return hasAchievement("A",26) }, //Works Fine
     autoPrestige() { return hasAchievement("A",26) }, //Works Fine
     autoUpgrade() { return hasAchievement("A",36) }, //Works now that I changed line 317 in game.js, Gotta keep an eye on this.
+    tabFormat: [
+        "main-display",
+        "blank",
+        "prestige-button",
+        ["infobox", "conviction"],
+        "upgrades",
+    ],
+    infoboxes: {
+        conviction: {
+            title: "conviction",
+            body() { 
+                let dis = "You can focus your Conviction into self improvement..<br>"+
+                "<br>"+
+                "Conviction is a 'static' resource, and thus you have to gain more faith than previously in order to increase it.<br>"+
+                "<br>"+
+                "Each upgrade sharing the same ROW doubles the cost of the upgrades in that ROW.<br>"+
+                "<br>"+
+                "The automation upgrades do not increase in cost."
+                return dis
+             },
+        },
+    },
     upgrades: {
         11: {
             title: "Belief",
@@ -89,8 +111,9 @@ addLayer("C", {
             },
         },
         15: {
-            fullDisplay: "Each Increases Cost By 1.5x",
+            fullDisplay: "Each Increases Cost By 2x",
             canAfford: false,
+            unlocked: false,
             effect() {
                 let cost  = new Decimal(1)
                 if (hasUpgrade("C",11)) cost = cost.mul(2)
@@ -136,6 +159,7 @@ addLayer("C", {
         25: {
             fullDisplay: "Each Increases Cost By 2x",
             canAfford: false,
+            unlocked: false,
             effect() {
                 let cost  = new Decimal(1)
                 if (hasUpgrade("C",21)) cost = cost.mul(2)
@@ -183,6 +207,7 @@ addLayer("C", {
         35: {
             fullDisplay: "Each Increases Cost By 2x",
             canAfford: false,
+            unlocked: false,
             effect() {
                 let cost  = new Decimal(1)
                 if (hasUpgrade("C",31)) cost = cost.mul(2)
@@ -208,7 +233,7 @@ addLayer("C", {
         },
         42: {
             title: "Burnt Offering",
-            description: "Automate buying Conviction upgrades",
+            description: "Automate buying Conviction upgrades, Forever",
             cost: new Decimal(1000),
             currencyDisplayName: "Gold",
             currencyInternalName: "points",

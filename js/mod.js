@@ -3,7 +3,7 @@ let modInfo = {
 	id: "cult1337",
 	author: "Neutral",
 	pointsName: "Faith",
-	modFiles: ["layers.js","tree.js"],
+	modFiles: ["layers.js","tree.js","layers/test.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -13,11 +13,14 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.3",
-	name: "Two layers done enough to get feedback",
+	num: "0.0.4",
+	name: "Advice implemented",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.4</h3><br>
+		- Changed world pop to (8.009e9), Thanks Bagel.<br>
+		- Changed from using bad upgrades as cost increase markers to using an infobox, Thanks jakub<br>
 	<br><h3>v0.0.3</h3><br>
 		- Mostly cosmetic changes.<br>
 		- Added an ending.<br>
@@ -120,7 +123,7 @@ function update(diff) {
 
 // Determines the population you can recruit. I intend to add the ability to find planets. Good luck to me!
 function populationLimit() {
-	let pop = new Decimal(7.837e9)
+	let pop = new Decimal(8.009e9)
 	return pop
 }
 

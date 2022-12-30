@@ -392,12 +392,7 @@ addLayer("G", {
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
-    layerShown() {
-        let shown = false
-        if(player.C.total.gte(500)) shown = true
-        if(player.G.unlocked) shown = true
-        return shown
-    },
+    layerShown() { return true },
     effect() {
         let eff = new Decimal(0)
         eff = eff.add(player.G.rec)
@@ -413,7 +408,7 @@ addLayer("G", {
             dis = "<br>you have recruited "+format(player.G.rec)+" people into your cult,<br>which is everyone,<br>your cult increases Conviction gain by "+format(this.effect().minus(1).mul(100))+"%"
         return dis
     },
-
+    
     update(diff) {
             player.G.rec = player.G.rec.add((buyableEffect(this.layer, 11)).times(diff))
             player.G.buyables[11] = player.G.buyables[11].add(buyableEffect(this.layer, 12).mul(diff))
@@ -424,6 +419,15 @@ addLayer("G", {
             //player.G.buyables[32] = player.G.buyables[32].add(player.G.buyables[41].mul(diff).div(60))
             //player.G.buyables[41] = player.G.buyables[41].add(player.G.buyables[42].mul(diff).div(120))
             if (player.G.rec.gte(populationLimit())) player.G.rec = populationLimit()
+    },
+    bars: {
+        bigBar: {
+            direction: RIGHT,
+            width: 200,
+            height: 50,
+            progress() { return 0.8 },
+            unlocked: true,
+        },
     },
     buyables: {
         11: {
@@ -517,7 +521,7 @@ addLayer("G", {
                 return eff
             },
         },
-        }
+        },
     }
 ),
 addLayer("ghost", {
@@ -542,7 +546,7 @@ addLayer("K", {
     type: "normal",                         // Determines the formula used for calculating prestige currency.
     exponent: 2,                          // "normal" prestige gain is (currency^exponent).
     hotkeys: [
-        {key: "K", description: "k: Reset for Chi", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
+        {key: "k", description: "k: Reset for Chi", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
         return new Decimal(1)               // Factor in any bonuses multiplying gain here.
@@ -550,12 +554,7 @@ addLayer("K", {
     gainExp() {                             // Returns the exponent to your gain of the prestige resource.
         return new Decimal(1)
     },
-    layerShown() {
-        let shown = false
-        if(player.C.total.gte(500)) shown = true
-        if(player.K.unlocked) shown = true
-        return shown
-    },
+    layerShown() { return true },
     effectDescription() {
         return "<br><h3>I don't do anything yet so please ignore me<h3>"
     },

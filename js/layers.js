@@ -257,7 +257,7 @@ addLayer("A", {
         cols: 6,
         11: {
             name: "That.. that's a nerf..",
-            doneTooltip: "This is worth 10 points",
+            doneTooltip: "This is worth 20 points",
             unlocked() {if (hasAchievement("A",11)) return true
             },
             done() {
@@ -270,7 +270,7 @@ addLayer("A", {
         },
         12: {
             name: "Softlocked",
-            doneTooltip: "Should have been 20 points..",
+            doneTooltip: "Should have been 40 points..",
             unlocked() {if (hasAchievement("A",12)) return true
             },
             done() {
@@ -357,7 +357,6 @@ addLayer("A", {
         },
     }
 }),
-
 addLayer("G", {
     startData() { return {                  // startData is a function that returns default data for a layer. 
         points: new Decimal(0),             // "points" is the internal name for the main resource of the layer.
@@ -372,7 +371,7 @@ addLayer("G", {
         bought7: new Decimal(0),
         bought8: new Decimal(0),
     }},
-    color: "#a413dc",                       // The color for this layer, which affects many elements.
+    color: "#7d8221",                       // The color for this layer, which affects many elements.
     resource: "Gold",                       // The name of this layer's main prestige resource.
     row: 1,                                 // The row this layer is on (0 is the first row).
     position: 0,
@@ -386,6 +385,16 @@ addLayer("G", {
     hotkeys: [
         {key: "g", description: "g: Reset for church gold", onPress(){if (canReset(this.layer)) doReset(this.layer)}},
     ],
+    tabFormat: [
+        "main-display",
+        "blank",
+        "prestige-button",
+        ["infobox", "members"],
+        ["bar", "bigBar"],
+        "blank",
+        "buyables",
+    ],
+    resetDescription: "<h3>Go on crusade</h3><br><br> spending conviction for <br>",
     gainMult() {                            // Returns your multiplier to your gain of the prestige resource.
         return new Decimal(1)               // Factor in any bonuses multiplying gain here.
     },
@@ -403,36 +412,82 @@ addLayer("G", {
         return eff
     },
     effectDescription() {
-        let dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>your cult increases Conviction gain by "+format(this.effect().minus(1).mul(100))+"%"
-        if (player.G.rec >= populationLimit()) 
-            dis = "<br>you have recruited "+format(player.G.rec)+" people into your cult,<br>which is everyone,<br>your cult increases Conviction gain by "+format(this.effect().minus(1).mul(100))+"%"
-        return dis
+        let dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>your cult increases Conviction gain by "
+        if (player.G.rec.gte( new Decimal(825))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of Vatican City,<br>your cult increases Conviction gain by "
+        if (player.G.rec.gte(new Decimal(56619))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of Denmark,<br>your cult increases Conviction gain by "
+        if (player.G.rec.gte(new Decimal(385230))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of Iceland,<br>your cult increases Conviction gain by "
+        if (player.G.rec.gte(new Decimal(5136679))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of New Zealand,<br>your cult increases Conviction gain by "   
+        if (player.G.rec.gte(new Decimal(84270625))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of Germany,<br>your cult increases Conviction gain by " 
+        if (player.G.rec.gte(new Decimal(1412600000))) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is more than the population of China,<br>your cult increases Conviction gain by "
+        if (player.G.rec.gte(populationLimit())) 
+            dis = "<br>you have recruited "+format(player.G.rec.floor())+" people into your cult,<br>which is everyone,<br>your cult increases Conviction gain by "
+        return dis+format(this.effect().minus(1).mul(100))+"%"
     },
     
     update(diff) {
             player.G.rec = player.G.rec.add((buyableEffect(this.layer, 11)).times(diff))
-            player.G.buyables[11] = player.G.buyables[11].add(buyableEffect(this.layer, 12).mul(diff))
-            player.G.buyables[12] = player.G.buyables[12].add(buyableEffect(this.layer, 21).mul(diff))
-            player.G.buyables[21] = player.G.buyables[21].add(buyableEffect(this.layer, 22).mul(diff))
-            //player.G.buyables[22] = player.G.buyables[22].add(player.G.buyables[31].mul(diff).div(30))
-            //player.G.buyables[31] = player.G.buyables[31].add(player.G.buyables[32].mul(diff).div(45))
-            //player.G.buyables[32] = player.G.buyables[32].add(player.G.buyables[41].mul(diff).div(60))
-            //player.G.buyables[41] = player.G.buyables[41].add(player.G.buyables[42].mul(diff).div(120))
+            player.G.buyables[11] = player.G.buyables[11].add(buyableEffect(this.layer, 21).mul(diff))
+            player.G.buyables[21] = player.G.buyables[21].add(buyableEffect(this.layer, 31).mul(diff))
+            player.G.buyables[31] = player.G.buyables[31].add(buyableEffect(this.layer, 41).mul(diff))
+            if (player.G.buyables[11].gte(populationLimit())) player.G.buyables[11] = populationLimit()
             if (player.G.rec.gte(populationLimit())) player.G.rec = populationLimit()
+    },
+    infoboxes: {
+        members: {
+            title: "members",
+            body() { 
+                let dis = "You can recruit members into your cult with all of that gold!<br>"+
+                "<br>"+
+                "Disciples go out into the world and recruit citizens.<br>"+
+                "Acolytes recruit more disciples, etc.<br>"+
+                "<br>"+
+                "Each member that you personally recruit multiplies the efficiency of that member type by the amount bought.<br>"+
+                "<br>"+
+                "<h3>Starting Productivity:</h3><br>"+
+                "Disciple: 1 citizen per second<br>"+
+                "Acolyte: 1 Disciple per 3 seconds<br>"+
+                "Priest: 1 Acolyte per 9 seconds<br>"+
+                "Bishop: 1 Preist per 15 seconds<br>"+
+                "<br>"+
+                "<h3>Current Productivity:</h3><br>"+
+                "Disciple: "+format(player[this.layer].bought1)+" citizen per second<br>"+
+                "Acolyte: "+format(player[this.layer].bought2.div(3))+" Disciple per second<br>"+
+                "Priest: "+format(player[this.layer].bought3.div(9))+" Acolyte per second<br>"+
+                "Bishop: "+format(player[this.layer].bought4.div(15))+" Preist per second<br>"+
+                "<br>"+
+                "<small><h6><sub>and yes, this is just a poor man's AD.</sub></h6></small>"
+                return dis
+             },
+        },
     },
     bars: {
         bigBar: {
             direction: RIGHT,
             width: 200,
             height: 50,
-            progress() { return 0.8 },
+            fillStyle: {'background-color' : "#063d57"},
+            textStyle: {'color': '#7d8221'},
+            progress() { 
+                let pro = player.G.rec
+                pro = pro.div(populationLimit())
+                return pro 
+            },
+            display() {
+                return format(this.progress().mul(100))+"% of Pop Recruited"
+            },
             unlocked: true,
         },
     },
     buyables: {
         11: {
             cost() { return new Decimal(2).pow(player[this.layer].bought1) },
-            display() { return "Disciple"+
+            display() { return "<h3>Disciple</h3>"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Citizens/second"+
@@ -451,10 +506,14 @@ addLayer("G", {
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 return eff
             },
+            style() { return {
+                'height': '100px',
+                'width' : '300px',
+            }},
         },
-        12: {
+        21: {
             cost() { return new Decimal(3).pow(player[this.layer].bought2.add(3)) },
-            display() { return "Acolyte"+
+            display() { return "<h3>Acolyte</h3>"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Disciples/second"+
@@ -474,10 +533,14 @@ addLayer("G", {
                 eff = eff.div(3)
                 return eff
             },
+            style() { return {
+                'height': '100px',
+                'width' : '300px',
+            }},
         },
-        21: {
+        31: {
             cost() { return new Decimal(5).pow(player[this.layer].bought3.add(5)) },
-            display() { return "Priest"+
+            display() { return "<h3>Priest</h3>"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Acolytes/second"+
@@ -497,10 +560,14 @@ addLayer("G", {
                 eff = eff.div(9)
                 return eff
             },
+            style() { return {
+                'height': '100px',
+                'width' : '300px',
+            }},
         },
-        22: {
+        41: {
             cost() { return new Decimal(7).pow(player[this.layer].bought4.add(5)) },
-            display() { return "Bishop"+
+            display() { return "<h3>Bishop</h3>"+
                                 "<br>"+
                                 "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Priests/second"+
@@ -520,6 +587,10 @@ addLayer("G", {
                 eff = eff.div(15)
                 return eff
             },
+            style() { return {
+                'height': '100px',
+                'width' : '300px',
+            }},
         },
         },
     }
@@ -541,7 +612,7 @@ addLayer("K", {
     branches: ["C"],
     baseResource: "Conviction",                 // The name of the resource your prestige gain is based on.
     baseAmount() { return player.C.points },  // A function to return the current amount of baseResource.
-    requires: new Decimal(1e800),               // The amount of the base needed to  gain 1 of the prestige currency. 
+    requires: new Decimal(1e69),               // The amount of the base needed to  gain 1 of the prestige currency. 
                                             // Also the amount required to unlock the layer.
     type: "normal",                         // Determines the formula used for calculating prestige currency.
     exponent: 2,                          // "normal" prestige gain is (currency^exponent).

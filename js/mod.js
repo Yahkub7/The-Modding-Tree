@@ -13,13 +13,20 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.2",
-	name: "Two layers and some automation!",
+	num: "0.0.3",
+	name: "Two layers done enough to get feedback",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.3</h3><br>
+		- Mostly cosmetic changes.<br>
+		- Added an ending.<br>
+		- Kinda sorta balanced gold maybe ish.<br>
+		- I intend for K to also boost Conviction so Gold is a _bit_ slow.<br>
+		- I'm actually probably going to have to slow it even more once that's implemented.<br>
+		- Now to start working on K. Just, later. It's 3am and I work tomorrow.<br>
 	<br><h3>v0.0.2</h3><br>
-		- Now 11 upgrades work as intended<br>
+		- Now 11 upgrades work as intended.<br>
 		- Automation of first layer exists.<br>
 		- Second layer implemented (badly).<br>
 		- Game is sort of psuedo balanced for about 10 minutes.<br>
@@ -69,8 +76,8 @@ function canGenPoints() {
 // To be used to get the base points/sec
 function getPointBase() {
 	let base = new Decimal(0.5)
-	base = base.mul(tmp.A.effect)
 	if (hasUpgrade("C",31)) base = base.add(0.5)
+	base = base.mul(tmp.A.effect)
 	return base
 }
 
@@ -126,14 +133,14 @@ var displayThings = [
 	function() {
 		let dis = getPointGen()
 		dis = dis.minus(player.points.mul(getDegen()))
-		dis = "("+format(dis)+") Net F/s<br>You lose " + getDegen().mul(100) + "% of your total Faith per second"
+		dis = "("+format(dis)+") Net F/s<br>You lose " + getDegen().mul(100) + "% of your total Faith per second<br>Endgame: Recruit the World (7.837e9)"
 		return "(" + format(getPointGen()) + ")" + " Gross F/s<br>"+dis
 	}
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.points.gte(new Decimal("e280000000"))
+	return player.G.rec.gte(new Decimal("7.837e9"))
 }
 
 

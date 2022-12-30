@@ -27,6 +27,7 @@ let changelog = `<h1>Changelog:</h1><br>
 		- To-Do: Figure out mechanics that are interesting for more layers.<br>
 		- To-Do: Space! Magic! Necromancy?<br>
 		- To-Do: Vampires and were-wolves and other things could be cool...<br>
+		- To-Do: Infobox for church explaining how the members work.<br>
 	<br><h3>v0.0.1</h3><br>
 		- 4 upgrades that work.<br>
 		- If you use "best: true," you can spend an hour trying to figure out why in the world it doesn't work on reset.<br>

@@ -147,8 +147,8 @@
 
 /* Used for respec button and similar */
 .longUpg {
-	height: 50px;
-	width: 120px;
+	height: 40px;
+	width: 100px;
 	background: var(--points);
 	border-radius: 50%;
 	border: 2px solid;

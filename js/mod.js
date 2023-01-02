@@ -13,14 +13,23 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.4",
-	name: "Advice implemented",
+	num: "0.0.5",
+	name: "We made the numbers do the up with time",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.5</h3><br>
+		- "Well Ackchyually, US Census Bureau Estimates 7.942e9" ~My Brother<br>
+		- Lots and lots and lots and lots of tweaking to fix the early game softlock achievements unbalancing things.<br>
+		- The goal is to get K working.<br>
+		- Not balanced, working.<br>
+		- Moved /s to INSIDE the (), cause it was unanimously decided upon. Thanks voters.<br>
+		- It's half working now so I'm releasing this for feedback on CONCEPT.<br>
+		- None Balance Exists.<br>
+		- None Effect Exists.<br>
 	<br><h3>v0.0.4</h3><br>
 		- Changed world pop to (8.009e9), Thanks Bagel.<br>
-		- Changed from using bad upgrades as cost increase markers to using an infobox, Thanks jakub<br>
+		- Changed from using bad upgrades as cost increase markers to using an infobox, Thanks jakub.<br>
 	<br><h3>v0.0.3</h3><br>
 		- Mostly cosmetic changes.<br>
 		- Added an ending.<br>
@@ -80,13 +89,13 @@ function canGenPoints() {
 function getPointBase() {
 	let base = new Decimal(0.5)
 	if (hasUpgrade("C",31)) base = base.add(0.5)
-	base = base.mul(tmp.A.effect)
 	return base
 }
 
 // To be used to get the multiplier of base points/sec
 function getPointMult() {
 	let mult = new Decimal(1)
+	mult = mult.mul(tmp.A.effect)
 	if (hasUpgrade("C",11)) mult = mult.add(1)
 	if (hasUpgrade("C",13)) mult = mult.mul(upgradeEffect("C",13))
 	return mult
@@ -123,7 +132,7 @@ function update(diff) {
 
 // Determines the population you can recruit. I intend to add the ability to find planets. Good luck to me!
 function populationLimit() {
-	let pop = new Decimal(8.009e9)
+	let pop = new Decimal(7.942e9)
 	return pop
 }
 
@@ -164,3 +173,4 @@ function maxTickLength() {
 // you can cap their current resources with this.
 function fixOldSave(oldVersion){
 }
+

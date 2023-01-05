@@ -21,9 +21,15 @@ addLayer("C", {
     canBuyMax: true,
     directMult() {
         let mult = new Decimal(1)
+        let pow = new Decimal(1)
         if (hasUpgrade("C", 33)) mult = mult.times(upgradeEffect("C",33))
         mult = mult.mul(tmp.G.effect)
-        return mult
+        if (hasMilestone("k",1)) pow = pow.add(0.1)
+        if (hasMilestone("k",2)) pow = pow.add(0.1)
+        if (hasMilestone("k",3)) pow = pow.add(0.1)
+        if (hasMilestone("k",4)) pow = pow.add(0.1)
+        if (hasMilestone("k",5)) pow = pow.add(0.1)
+        return mult.pow(pow)
     },
     gainMult() {
         let mult = new Decimal(1)
@@ -520,7 +526,7 @@ addLayer("G", {
                 "Initiates go out into the world and recruit citizens.<br>"+
                 "Disciples recruit more Initiates, etc.<br>"+
                 "<br>"+
-                "Each member that you personally recruit multiplies the efficiency of that member type by the amount bought.<br>"+
+                "Each member that you personally recruit multiplies the efficiency of that member type by 1.25^amount bought.<br>"+
                 "<br>"+
                 "<h3>Starting Productivity:</h3><br>"+
                 "Initiate: 1 Citizen  per 2 seconds<br>"+
@@ -529,10 +535,10 @@ addLayer("G", {
                 "Acolyte: 1 Thrall per 30 seconds<br>"+
                 "<br>"+
                 "<h3>Current Productivity:</h3><br>"+
-                "Initiate: "+format(player[this.layer].bought1.div(2))+" Citizen per second<br>"+
-                "Disciple: "+format(player[this.layer].bought2.div(5))+" Initiate per second<br>"+
-                "Thrall: "+format(player[this.layer].bought3.div(15))+" Disciple per second<br>"+
-                "Acolyte: "+format(player[this.layer].bought4.div(30))+" Thrall per second<br>"+
+                "Initiate: "+   format(buyableEffect('G',11).div(getBuyableAmount('G',11)))+    " Citizen per second<br>"+
+                "Disciple: "+   format(buyableEffect('G',21).div(getBuyableAmount('G',21)))+    " Initiate per second<br>"+
+                "Thrall: "+     format(buyableEffect('G',31).div(getBuyableAmount('G',31)))+    " Disciple per second<br>"+
+                "Acolyte: "+    format(buyableEffect('G',41).div(getBuyableAmount('G',41)))+    " Thrall per second<br>"+
                 "<br>"+
                 "<small><h6><sub>and yes, this is just a poor man's AD.</sub></h6></small>"
                 return dis
@@ -559,10 +565,9 @@ addLayer("G", {
     },
     buyables: {
         11: {
+            title: "Initiate",
             cost() { return new Decimal(2).pow(player[this.layer].bought1) },
-            display() { return "<h3>Initiate</h3>"+
-                                "<br>"+
-                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+            display() { return "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Citizens/second"+
                                 "<br>"+
                                 "<br> you have bought "+player[this.layer].bought1+
@@ -575,7 +580,7 @@ addLayer("G", {
             },
             effect() {
                 let eff = new Decimal(1)
-                eff = eff.mul(player[this.layer].bought1)
+                eff = eff.mul(new Decimal(1.25).pow(player[this.layer].bought1.minus(1)))
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 eff = eff.div(2)
                 return eff
@@ -586,10 +591,9 @@ addLayer("G", {
             }},
         },
         21: {
+            title: "Disciple",
             cost() { return new Decimal(4).pow(player[this.layer].bought2.add(2)) },
-            display() { return "<h3>Disciple</h3>"+
-                                "<br>"+
-                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+            display() { return "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Disciples/second"+
                                 "<br>"+
                                 "<br> you have bought "+player[this.layer].bought2+
@@ -602,7 +606,7 @@ addLayer("G", {
             },
             effect() {
                 let eff = new Decimal(1)
-                eff = eff.mul(player[this.layer].bought2)
+                eff = eff.mul(new Decimal(1.25).pow(player[this.layer].bought2.minus(1)))
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 eff = eff.div(5)
                 return eff
@@ -613,10 +617,9 @@ addLayer("G", {
             }},
         },
         31: {
+            title: "Thrall",
             cost() { return new Decimal(8).pow(player[this.layer].bought3.add(3)) },
-            display() { return "<h3>Thrall</h3>"+
-                                "<br>"+
-                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+            display() { return "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Acolytes/second"+
                                 "<br>"+
                                 "<br> you have bought "+player[this.layer].bought3+
@@ -629,7 +632,7 @@ addLayer("G", {
             },
             effect() {
                 let eff = new Decimal(1)
-                eff = eff.mul(player[this.layer].bought3)
+                eff = eff.mul(new Decimal(1.25).pow(player[this.layer].bought3.minus(1)))
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 eff = eff.div(15)
                 return eff
@@ -640,10 +643,9 @@ addLayer("G", {
             }},
         },
         41: {
+            title: "Acolyte",
             cost() { return new Decimal(16).pow(player[this.layer].bought4.add(4)) },
-            display() { return "<h3>Acolyte</h3>"+
-                                "<br>"+
-                                "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
+            display() { return "<br>You have "+format(getBuyableAmount(this.layer, this.id))+
                                 "<br>They recruit "+format(buyableEffect(this.layer, this.id))+" Priests/second"+
                                 "<br>"+
                                 "<br> you have bought "+player[this.layer].bought4+
@@ -656,7 +658,7 @@ addLayer("G", {
             },
             effect() {
                 let eff = new Decimal(1)
-                eff = eff.mul(player[this.layer].bought4)
+                eff = eff.mul(new Decimal(1.25).pow(player[this.layer].bought4.minus(1)))
                 eff = eff.mul(getBuyableAmount(this.layer, this.id))
                 eff = eff.div(30)
                 return eff
@@ -680,13 +682,20 @@ addLayer("k", {
         unlocked: false,
         sta: new Decimal(1),
         str: new Decimal(1),
-        dex: new Decimal(1),
-        con: new Decimal(1),
+        spd: new Decimal(1),
         int: new Decimal(1),
         wis: new Decimal(1),
-        stamleft: new Decimal(1000000),
-        stammax: new Decimal(0),
+        lck: new Decimal(1),
+        maths: 0,
+        math1: 1,
+        math2: 1,
+        lckfactor: new Decimal(0.51),
+        lckmult: new Decimal(1),
+        stamleft: new Decimal(1),
+        stammax: new Decimal(1),
         prog: new Decimal(0),
+        retry: false,
+        saved: 11,
     }},
     tabFormat: [
         "main-display",
@@ -694,12 +703,12 @@ addLayer("k", {
         "prestige-button",
         ["infobox", "training"],
         ["row", 
-        [["display-text", function() { return "STA<br>"+format(player.k.sta) },{ "color": "white", "font-size": "32px"}],"blank","blank",
+        [["display-text", function() { return "STA<br>"+format(player.k.sta) },{ "color": "yellow", "font-size": "32px"}],"blank","blank",
          ["display-text", function() { return "STR<br>"+format(player.k.str) },{ "color": "red", "font-size": "32px"}],"blank","blank",
-         ["display-text", function() { return "DEX<br>"+format(player.k.dex) },{ "color": "blue", "font-size": "32px"}],"blank","blank",
-         ["display-text", function() { return "CON<br>"+format(player.k.con) },{ "color": "green", "font-size": "32px"}],"blank","blank",
+         ["display-text", function() { return "SPD<br>"+format(player.k.spd) },{ "color": "blue", "font-size": "32px"}],"blank","blank",
          ["display-text", function() { return "INT<br>"+format(player.k.int) },{ "color": "orange", "font-size": "32px"}],"blank","blank",
-         ["display-text", function() { return "WIS<br>"+format(player.k.wis) },{ "color": "purple", "font-size": "32px"}]
+         ["display-text", function() { return "WIS<br>"+format(player.k.wis) },{ "color": "purple", "font-size": "32px"}],"blank","blank",
+         ["display-text", function() { return "LCK<br>"+format(player.k.lck) },{ "color": "green", "font-size": "32px"}],
         ]],
         "blank",
         ["microtabs", "training"],
@@ -729,54 +738,119 @@ addLayer("k", {
     effectDescription() {
         return ""
     },
-    staminaUpgdate() {
-        if ([11,21,01].some(id => inChallenge(this.layer,id))) 
-            player.k.stamleft = player.k.stamleft.minus(new Decimal(1).div(player.k.con).mul(0.05))
-        if ([12,22,02].some(id => inChallenge(this.layer,id))) 
-            player.k.stamleft = player.k.stamleft.minus(new Decimal(10).div(player.k.con).mul(0.05))
-        if ([13,23,03].some(id => inChallenge(this.layer,id))) 
-            player.k.stamleft = player.k.stamleft.minus(new Decimal(100).div(player.k.con).mul(0.05))
-        if ([14,24,04].some(id => inChallenge(this.layer,id))) 
-            player.k.stamleft = player.k.stamleft.minus(new Decimal(1000).div(player.k.con).mul(0.05))
-        if ([11,12,13,14,21,22,23,24].some(id => inChallenge(this.layer,id)))  
-            player.k.prog = player.k.prog.add(0.005)
-        if ([01,02,03,04,05,06,07,08,09].some(id => inChallenge(this.layer,id)))  
-            player.k.prog = player.k.prog.add(new Decimal(0.05).mul(player.k.str).pow(player.k.int.pow(player.k.wis.pow(0.5))))
+    staminaUpdate() {
+        if ([11,21,31,01].some(id => inChallenge(this.layer,id))) 
+            player.k.stamleft = player.k.stamleft.minus(new Decimal(0.05).mul(player.k.spd.pow(0.25)))
+        if ([12,22,32,02].some(id => inChallenge(this.layer,id))) 
+            player.k.stamleft = player.k.stamleft.minus(new Decimal(0.20).mul(player.k.spd.pow(0.25)))
+        if ([13,23,33,03].some(id => inChallenge(this.layer,id))) 
+            player.k.stamleft = player.k.stamleft.minus(new Decimal(1.25).mul(player.k.spd.pow(0.25)))
+        if ([14,24,34,04].some(id => inChallenge(this.layer,id))) 
+            player.k.stamleft = player.k.stamleft.minus(new Decimal(7.5).mul(player.k.spd.pow(0.25)))
+        if ([05].some(id => inChallenge(this.layer,id))) 
+            player.k.stamleft = player.k.stamleft.minus(new Decimal(50).mul(player.k.spd.pow(0.25)))
+
+        if ([11,12,13,14,21,22,23,24,31,32,33,34,01,02,03,04,05,06,07,08,09].some(id => inChallenge(this.layer,id)))  
+            player.k.prog = player.k.prog.add(new Decimal(0.0025).mul((player.k.str.pow(0.1)).mul(player.k.wis.pow(0.1))).pow(0.25).mul(player.k.spd.pow(0.25)).mul(player.k.lck.pow(0.01)))
  
         if (player.k.stamleft.lte(0)) {
+            player.k.saved = player.k.activeChallenge
             run(tmp.k.challenges[player.k.activeChallenge].onExit)
             Vue.set(player["k"], "activeChallenge", null)
+            player.k.resetTime = 0
+            if (player.k.retry) player.k.activeChallenge = player.k.saved
             return
-        }
- 
+        } 
     },
-
     componentStyles: {
         "challenge"() {return {"height":"200px","font-size":"15px"}},
     },
     microtabs: {
         training: {
-            shop: {
+            upg: {
                 content: [
                     "blank",
                     ["bar", "staBar"],
+                    "blank",
+                    "buyables",
                     "blank",
                     "upgrades",
                 ]
             },
-            train: {
+            sta: {
                 unlocked() { return hasUpgrade("k",11) },
                 content: [
                     "blank",
                     ["bar", "staBar"],
+                    ["row",[["toggle",["k", "retry"]],["display-text","<- Auto Repeat Last Training"]]],
                     "h-line",
-                    ["display-text", function() { return "STA" },{ "color": "white", "font-size": "20px"}],
+                    ["display-text", function() { return "STA" },{ "color": "white", "font-size": "30px"}],
                     ["row",[["challenge", 11],["challenge", 12]]],
                     ["row",[["challenge", 13],["challenge", 14]]],
+                    ["challenge",71],
+                ]
+            },
+            str: {
+                unlocked() { return hasUpgrade("k",13) },
+                content: [
+                    "blank",
+                    ["bar", "staBar"],
+                    ["row",[["toggle",["k", "retry"]],["display-text","<- Auto Repeat Last Training"]]],
                     "h-line",
-                    ["display-text", function() { return "STR" },{ "color": "white", "font-size": "16px"}],
+                    ["display-text", function() { return "STR" },{ "color": "white", "font-size": "30px"}],
                     ["row",[["challenge", 21],["challenge", 22]]],
                     ["row",[["challenge", 23],["challenge", 24]]],
+                    ["challenge",71],
+                ]
+            },
+            spd: {
+                unlocked() { return hasUpgrade("k",13) },
+                content: [
+                    "blank",
+                    ["bar", "staBar"],
+                    ["row",[["toggle",["k", "retry"]],["display-text","<- Auto Repeat Last Training"]]],
+                    "h-line",
+                    ["display-text", function() { return "SPD" },{ "color": "white", "font-size": "30px"}],
+                    ["row",[["challenge", 31],["challenge", 32]]],
+                    ["row",[["challenge", 33],["challenge", 34]]],
+                    ["challenge",71],
+                ]
+            },
+            int: {
+                unlocked() { return hasUpgrade("k",14) },
+                content: [
+                    "blank",
+                    ["bar", "staBar"],
+                    ["row",[["toggle",["k", "retry"]],["display-text","<- Auto Repeat Last Training"]]],
+                    "h-line",
+                    ["display-text", function() { return "INT" },{ "color": "white", "font-size": "30px"}],
+                    ["display-text", function() { return player.k.math1+"*"+player.k.math2+"=?" },{ "color": "white", "font-size": "30px"}],
+                    ["text-input","maths"],
+                    ["clickable",21],
+                    ["row",[["challenge", 41],["challenge", 42]]],
+                    ["row",[["challenge", 43],["challenge", 44]]],
+                    ["challenge",71],
+                ]
+            },
+            wis: {
+                unlocked() { return hasUpgrade("k",14) },
+                content: [
+                    "blank",
+                    ["bar", "staBar"],
+                    ["row",[["toggle",["k", "retry"]],["display-text","<- Auto Repeat Last Training"]]],
+                    "h-line",
+                    ["display-text", function() { return "WIS" },{ "color": "white", "font-size": "30px"}],
+                    ["row",[["challenge", 51],["challenge", 52]]],
+                    ["row",[["challenge", 53],["challenge", 54]]],
+                    ["challenge",71],
+                ]
+            },
+            lck: {
+                unlocked() { return hasUpgrade("k",15) },
+                content: [
+                    "h-line",
+                    ["display-text", function() { return "LCK" },{ "color": "white", "font-size": "30px"}],
+                    ["row",[["clickable", 11],["clickable", 12],["clickable", 13]]],
                 ]
             },
             compete: {
@@ -786,6 +860,7 @@ addLayer("k", {
                     ["bar", "staBar"],
                     "blank",
                     ["display-text", function() { return "DOJO" },{ "color": "white", "font-size": "32px"}],
+                    "milestones",
                     ["challenge", 01],
                     ["challenge", 02],
                     ["challenge", 03],
@@ -806,8 +881,19 @@ addLayer("k", {
             title: "Training",
             body() { 
                 let dis = "This is for explaining how this shit works: It doesn't.<br>But you spend the time in the thing to increase the things to be able to beat the things."
-                dis = dis+"<br><br><br> Psuedo Implemented STA and STR training. Formulas need work, but you can gain them, and they help complete the belts."
-                dis = dis+"<br> THIS LAYER STILL HAS NO EFFECT ON ANYTHING ELSE."
+                dis = dis+"<br><br><br> Psuedo Implemented STATS training. Formulas need work, but you can gain them, and they help complete the belts."
+                dis = dis+"<br> ONLY THE BELTS HAVE AN EFFECT OUTSIDE THIS LAYER."
+                dis = dis+"<br>"
+                dis = dis+"<br>STA: Stamina"
+                dis = dis+"<br>STR: Strength"
+                dis = dis+"<br>SPD: Speed"
+                dis = dis+"<br>INT: Intelligence"
+                dis = dis+"<br>WIS: Wisdom"
+                dis = dis+"<br>LCK: Luck"
+                dis = dis+"<br>"
+                dis = dis+"<br>The only one that doesn't work like you think it would is INT, INT makes you work smarter, not harder, and reduces stamina drain."
+                dis = dis+"<br>"
+                dis = dis+"<br>No attempt has yet been made at balancing the upgrades/buyables/etc."
                 return dis
              },
         },
@@ -830,6 +916,163 @@ addLayer("k", {
             unlocked: true,
         },
     },
+    clickables: {
+        11: {
+            title: "Gamble",
+            display() {return "Gamble 4 LCK<br>"+new Decimal(1).minus(player.k.lckfactor).mul(100)+"% Chance<br><br>Cost: 1 Chi"},
+            canClick() {return player.k.points.gte(1)},
+            onClick() {
+                 player.k.points = player.k.points.add(-1)
+                 player.k.lck = player.k.lck.add(new Decimal(Math.random()).minus(player.k.lckfactor).mul(player.k.lckmult))
+            },
+        },
+        12: {
+            title: "Reset",
+            display() {return "Reset LCK to 1<br><br>Cost: 100 Chi"},
+            canClick() {return player.k.points.gte(100)},
+            onClick() {
+                player.k.points = player.k.points.add(-100)
+                player.k.lck = new Decimal(1)
+           },
+        },
+        13: {
+            title: "More Luck",
+            display() {return "x10 to LCK gain<br><br>Cost: "+player.k.lckmult.mul(100)+" Chi"},
+            canClick() {return player.k.points.gte(player.k.lckmult.mul(100))},
+            onClick() {
+                player.k.points = player.k.points.add(player.k.lckmult.mul(-10))
+                player.k.lckmult = player.k.lckmult.mul(10)
+           },
+        },
+        21: {
+            title: "Check Math",
+            display() {return "Math 4 INT<br><br>Cost: 1 Chi"},
+            canClick() {return player.k.points.gte(1)},
+            onClick() {
+                 player.k.points = player.k.points.add(-1)
+                 if (player.k.maths==player.k.math1*player.k.math2) player.k.int = player.k.int.mul(1.1).add(1)
+                 if ((player.k.maths==player.k.math1*player.k.math2)||(player.k.math1*player.k.math2==69)) {
+                    player.k.lck = player.k.lck.mul(1.69)
+                    console.log("nice")
+                 }
+                 player.k.math1 = Math.round((Math.random()+0.1)*5)
+                 player.k.math2 = Math.round((Math.random()+0.1)*25)
+                 player.k.maths = 0
+            },
+        },
+    },
+    buyables: {
+        11: {
+            title: "Better Shoes",
+            cost(x) { return new Decimal(10).pow(x) },
+            display() { return "<br>Amount: "+getBuyableAmount(this.layer, this.id)+
+                                "<br>Effect: +"+(buyableEffect(this.layer, this.id).sub(1).mul(100).round())+"% STA"+
+                                "<br>"+
+                                "<br>Cost: "+format((this.cost()))+" Chi" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            effect() {
+                let eff = new Decimal(1.1)
+                eff = eff.pow(getBuyableAmount(this.layer, this.id))
+                return eff
+            },
+            style() { return {
+                'height': '100px',
+                'width' : '150px',
+            }},
+        },
+        12: {
+            title: "Better Weights",
+            cost(x) { return new Decimal(10).pow(x) },
+            display() { return "<br>Amount: "+getBuyableAmount(this.layer, this.id)+
+                                "<br>Effect: +"+(buyableEffect(this.layer, this.id).sub(1).mul(100).round())+"% STR"+
+                                "<br>"+
+                                "<br>Cost: "+format((this.cost()))+" Chi" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            effect() {
+                let eff = new Decimal(1.1)
+                eff = eff.pow(getBuyableAmount(this.layer, this.id))
+                return eff
+            },
+            style() { return {
+                'height': '100px',
+                'width' : '150px',
+            }},
+        },
+        13: {
+            title: "Better Bands",
+            cost(x) { return new Decimal(10).pow(x) },
+            display() { return "<br>Amount: "+getBuyableAmount(this.layer, this.id)+
+                                "<br>Effect: +"+(buyableEffect(this.layer, this.id).sub(1).mul(100).round())+"% SPD"+
+                                "<br>"+
+                                "<br>Cost: "+format((this.cost()))+" Chi" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            effect() {
+                let eff = new Decimal(1.1)
+                eff = eff.pow(getBuyableAmount(this.layer, this.id))
+                return eff
+            },
+            style() { return {
+                'height': '100px',
+                'width' : '150px',
+            }},
+        },
+        21: {
+            title: "Better Books",
+            cost(x) { return new Decimal(10).pow(x) },
+            display() { return "<br>Amount: "+getBuyableAmount(this.layer, this.id)+
+                                "<br>Effect: +"+(buyableEffect(this.layer, this.id).sub(1).mul(100).round())+"% INT"+
+                                "<br>"+
+                                "<br>Cost: "+format((this.cost()))+" Chi" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            effect() {
+                let eff = new Decimal(1.1)
+                eff = eff.pow(getBuyableAmount(this.layer, this.id))
+                return eff
+            },
+            style() { return {
+                'height': '100px',
+                'width' : '150px',
+            }},
+        },
+        22: {
+            title: "Better Glasses",
+            cost(x) { return new Decimal(10).pow(x) },
+            display() { return "<br>Amount: "+getBuyableAmount(this.layer, this.id)+
+                                "<br>Effect: +"+(buyableEffect(this.layer, this.id).sub(1).mul(100).round())+"% WIS"+
+                                "<br>"+
+                                "<br>Cost: "+format((this.cost()))+" Chi" },
+            canAfford() { return player[this.layer].points.gte(this.cost()) },
+            buy() {
+                player[this.layer].points = player[this.layer].points.sub(this.cost())
+                setBuyableAmount(this.layer, this.id, getBuyableAmount(this.layer, this.id).add(1))
+            },
+            effect() {
+                let eff = new Decimal(1.1)
+                eff = eff.pow(getBuyableAmount(this.layer, this.id))
+                return eff
+            },
+            style() { return {
+                'height': '100px',
+                'width' : '150px',
+            }},
+        },
+    },
     upgrades: {
         11: {
             description: "Harness The Supreme Force Of Your Vital Energies Into Pure Coalesced Inspiration, Discovering Ways To Increase Your Capabilities",
@@ -843,7 +1086,31 @@ addLayer("k", {
             currencyLayer: "G",
         },
         13: {
-            description: "Conjure The Will To Jog",
+            description: "Realize You Can Do More Than Walk Places",
+            cost: new Decimal(100),
+        },
+        14: {
+            description: "Manifest A Thought And Unlock Mental Training",
+            cost: new Decimal(100),
+        },
+        15: {
+            description: "Conjure The Metaphysical Forces Of Luck",
+            cost: new Decimal(100),
+        },
+        21: {
+            description: "Improved Training Techniques",
+            cost: new Decimal(100),
+        },
+        22: {
+            description: "Advanced Training Techniques",
+            cost: new Decimal(100),
+        },
+        23: {
+            description: "Expert Training Techniques",
+            cost: new Decimal(100),
+        },
+        24: {
+            description: "Omni Training<br>Not implemented",
             cost: new Decimal(100),
         },
     },
@@ -851,17 +1118,18 @@ addLayer("k", {
         11: {
             name: "Go Walking",
             fullDisplay() {
-                let cost = "drains (1/con) STA per second<br>"
-                let gain = format((player.k.prog).pow(2))+" STA gained on exit<br>"
-                let per = "("+format((player.k.prog).pow(2).div(player.k.resetTime))+"/s)"
+                let cost = "drains 1 STA per second<br>"
+                let gain = format(player.k.prog.pow(1.25).mul(buyableEffect('k', 11)))+" STA gained on exit<br>"
+                let per = "("+format(player.k.prog.pow(1.25).mul(buyableEffect('k', 11)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
             },
             onExit() {
-                player.k.sta = player.k.sta.add(player.k.prog.pow(2))
+                player.k.sta = player.k.sta.add(player.k.prog.pow(1.25).mul(buyableEffect('k', 11)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -872,18 +1140,20 @@ addLayer("k", {
         },
         12: {
             name: "Go Jogging",
+            unlocked() {return hasUpgrade('k',21) },
             fullDisplay() {
-                let cost = "drains (5/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(2).pow(2.5))+" STA gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(2).pow(2.5).div(player.k.resetTime))+"/s)"
+                let cost = "drains 5 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.5).mul(buyableEffect('k', 11)))+" STA gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.5).mul(buyableEffect('k', 11)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
             },
             onExit() {
-                player.k.sta = player.k.sta.add(player.k.prog.mul(2.5).pow(2))
+                player.k.sta = player.k.sta.add(player.k.prog.pow(1.5).mul(buyableEffect('k', 11)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -894,10 +1164,11 @@ addLayer("k", {
         },
         13: {
             name: "Go Running",
+            unlocked() {return hasUpgrade('k',22) },
             fullDisplay() {
-                let cost = "drains (25/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(3).pow(3))+" STA gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(3).pow(3).div(player.k.resetTime))+"/s)"
+                let cost = "drains 25 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.75).mul(buyableEffect('k', 11)))+" STA gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.75).mul(buyableEffect('k', 11)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
@@ -905,7 +1176,7 @@ addLayer("k", {
                 player.k.stamleft = player.k.stammax
             },
             onExit() {
-                player.k.sta = player.k.sta.add(player.k.prog.mul(3).pow(3))
+                player.k.sta = player.k.sta.add(player.k.prog.pow(1.75).mul(buyableEffect('k', 11)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -916,10 +1187,11 @@ addLayer("k", {
         },
         14: {
             name: "Go Sprinting",
+            unlocked() {return hasUpgrade('k',23) },
             fullDisplay() {
-                let cost = "drains (125/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(4).pow(4))+" STA gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(4).pow(4).div(player.k.resetTime))+"/s)"
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 11)))+" STA gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 11)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
@@ -927,7 +1199,7 @@ addLayer("k", {
                 player.k.stamleft = player.k.stammax
             },
             onExit() {
-                player.k.sta = player.k.sta.add(player.k.prog.mul(4).pow(4))
+                player.k.sta = player.k.sta.add(player.k.prog.pow(2).mul(buyableEffect('k', 11)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -937,19 +1209,20 @@ addLayer("k", {
             },
         },
         21: {
-            name: "Push-Ups",
+            name: "str 1",
             fullDisplay() {
-                let cost = "drains (1/con) STA per second<br>"
-                let gain = format((player.k.prog).pow(2))+" STR gained on exit<br>"
-                let per = "("+format((player.k.prog).pow(2).div(player.k.resetTime))+"/s)"
+                let cost = "drains 1 STA per second<br>"
+                let gain = format(player.k.prog.pow(1.25).mul(buyableEffect('k', 12)))+" STR gained on exit<br>"
+                let per = "("+format(player.k.prog.pow(1.25).mul(buyableEffect('k', 12)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
             },
             onExit() {
-                player.k.str = player.k.str.add(player.k.prog.pow(2))
+                player.k.str = player.k.str.add(player.k.prog.pow(1.25).mul(buyableEffect('k', 12)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -959,19 +1232,21 @@ addLayer("k", {
             },
         },
         22: {
-            name: "Squats",
+            name: "str 2",
+            unlocked() {return hasUpgrade('k',21) },
             fullDisplay() {
-                let cost = "drains (5/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(2).pow(2.5))+" STR gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(2).pow(2.5).div(player.k.resetTime))+"/s)"
+                let cost = "drains 5 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.5).mul(buyableEffect('k', 12)))+" STR gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.5).mul(buyableEffect('k', 12)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
             },
             onExit() {
-                player.k.str = player.k.str.add(player.k.prog.mul(2.5).pow(2))
+                player.k.str = player.k.str.add(player.k.prog.pow(1.5).mul(buyableEffect('k', 12)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -981,11 +1256,12 @@ addLayer("k", {
             },
         },
         23: {
-            name: "Hit The Gym",
+            name: "str 3",
+            unlocked() {return hasUpgrade('k',22) },
             fullDisplay() {
-                let cost = "drains (25/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(3).pow(3))+" STR gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(3).pow(3).div(player.k.resetTime))+"/s)"
+                let cost = "drains 25 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.75).mul(buyableEffect('k', 12)))+" STR gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.75).mul(buyableEffect('k', 12)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
@@ -993,7 +1269,7 @@ addLayer("k", {
                 player.k.stamleft = player.k.stammax
             },
             onExit() {
-                player.k.str = player.k.str.add(player.k.prog.mul(3).pow(3))
+                player.k.str = player.k.str.add(player.k.prog.pow(1.75).mul(buyableEffect('k', 12)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -1003,11 +1279,12 @@ addLayer("k", {
             },
         },
         24: {
-            name: "Leg Day",
+            name: "str 4",
+            unlocked() {return hasUpgrade('k',23) },
             fullDisplay() {
-                let cost = "drains (125/con) STA per second<br>"
-                let gain = format((player.k.prog).mul(4).pow(4))+" STR gained on exit<br>"
-                let per = "("+format((player.k.prog).mul(4).pow(4).div(player.k.resetTime))+"/s)"
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 12)))+" STR gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 12)).div(player.k.resetTime))+"/s)"
                 return cost+gain+per
             },
             onEnter() { 
@@ -1015,7 +1292,313 @@ addLayer("k", {
                 player.k.stamleft = player.k.stammax
             },
             onExit() {
-                player.k.str = player.k.str.add(player.k.prog.mul(4).pow(4))
+                player.k.str = player.k.str.add(player.k.prog.pow(2).mul(buyableEffect('k', 12)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        31: {
+            name: "SPD 1",
+            fullDisplay() {
+                let cost = "drains 1 STA per second<br>"
+                let gain = format(player.k.prog.pow(1.25).mul(buyableEffect('k', 13)))+" SPD gained on exit<br>"
+                let per = "("+format(player.k.prog.pow(1.25).mul(buyableEffect('k', 13)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.spd = player.k.spd.add(player.k.prog.pow(1.25).mul(buyableEffect('k', 13)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        32: {
+            name: "SPD 2",
+            unlocked() {return hasUpgrade('k',21) },
+            fullDisplay() {
+                let cost = "drains 5 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.5).mul(buyableEffect('k', 13)))+" SPD gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.5).mul(buyableEffect('k', 13)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.spd = player.k.spd.add(player.k.prog.pow(1.5).mul(buyableEffect('k', 13)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        33: {
+            name: "SPD 3",
+            unlocked() {return hasUpgrade('k',22) },
+            fullDisplay() {
+                let cost = "drains 25 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.75).mul(buyableEffect('k', 13)))+" SPD gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.75).mul(buyableEffect('k', 13)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.spd = player.k.spd.add(player.k.prog.pow(1.75).mul(buyableEffect('k', 13)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        34: {
+            name: "SPD 4",
+            unlocked() {return hasUpgrade('k',23) },
+            fullDisplay() {
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 13)))+" SPD gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 13)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.spd = player.k.spd.add(player.k.prog.pow(2).mul(buyableEffect('k', 13)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        41: {
+            name: "INT 1",
+            fullDisplay() {
+                let cost = "drains 1 STA per second<br>"
+                let gain = format(player.k.prog.pow(1.25).mul(buyableEffect('k', 13)))+" INT gained on exit<br>"
+                let per = "("+format(player.k.prog.pow(1.25).mul(buyableEffect('k', 13)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.int = player.k.int.add(player.k.prog.pow(1.25).mul(buyableEffect('k', 21)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        42: {
+            name: "INT 2",
+            unlocked() {return hasUpgrade('k',21) },
+            fullDisplay() {
+                let cost = "drains 5 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.5).mul(buyableEffect('k', 21)))+" INT gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.5).mul(buyableEffect('k', 21)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.int = player.k.int.add(player.k.prog.pow(1.5).mul(buyableEffect('k', 21)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        43: {
+            name: "INT 3",
+            unlocked() {return hasUpgrade('k',22) },
+            fullDisplay() {
+                let cost = "drains 25 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.75).mul(buyableEffect('k', 21)))+" INT gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.75).mul(buyableEffect('k', 21)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.int = player.k.int.add(player.k.prog.pow(1.75).mul(buyableEffect('k', 21)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        44: {
+            name: "INT 4",
+            unlocked() {return hasUpgrade('k',23) },
+            fullDisplay() {
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 21)))+" INT gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 21)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.int = player.k.int.add(player.k.prog.pow(2).mul(buyableEffect('k', 21)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        51: {
+            name: "WIS 1",
+            fullDisplay() {
+                let cost = "drains 1 STA per second<br>"
+                let gain = format(player.k.prog.pow(1.25).mul(buyableEffect('k', 22)))+" WIS gained on exit<br>"
+                let per = "("+format(player.k.prog.pow(1.25).mul(buyableEffect('k', 22)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.wis = player.k.wis.add(player.k.prog.pow(1.25).mul(buyableEffect('k', 22)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        52: {
+            name: "WIS 2",
+            unlocked() {return hasUpgrade('k',21) },
+            fullDisplay() {
+                let cost = "drains 5 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.5).mul(buyableEffect('k', 22)))+" WIS gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.5).mul(buyableEffect('k', 22)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            onExit() {
+                player.k.wis = player.k.wis.add(player.k.prog.pow(1.5).mul(buyableEffect('k', 22)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        53: {
+            name: "WIS 3",
+            unlocked() {return hasUpgrade('k',22) },
+            fullDisplay() {
+                let cost = "drains 25 STA per second<br>"
+                let gain = format((player.k.prog).pow(1.75).mul(buyableEffect('k', 22)))+" WIS gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(1.75).mul(buyableEffect('k', 22)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.wis = player.k.wis.add(player.k.prog.pow(1.75).mul(buyableEffect('k', 22)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        54: {
+            name: "WIS 4",
+            unlocked() {return hasUpgrade('k',23) },
+            fullDisplay() {
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 22)))+" WIS gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 22)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.wis = player.k.wis.add(player.k.prog.pow(2).mul(buyableEffect('k', 22)))
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return false
+            },
+        },
+        71: {
+            name: "Omni1",
+            unlocked() {return hasUpgrade('k',24) },
+            fullDisplay() {
+                let cost = "drains 150 STA per second<br>"
+                let gain = format((player.k.prog).pow(2).mul(buyableEffect('k', 22)))+" STATS gained on exit<br>"
+                let per = "("+format((player.k.prog).pow(2).mul(buyableEffect('k', 22)).div(player.k.resetTime))+"/s)"
+                return cost+gain+per
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.sta = player.k.sta.add(player.k.prog.pow(2).mul(buyableEffect('k', 11)))
+                player.k.str = player.k.str.add(player.k.prog.pow(2).mul(buyableEffect('k', 12)))
+                player.k.spd = player.k.spd.add(player.k.prog.pow(2).mul(buyableEffect('k', 13)))
+                player.k.int = player.k.int.add(player.k.prog.pow(2).mul(buyableEffect('k', 21)))
+                player.k.wis = player.k.wis.add(player.k.prog.pow(2).mul(buyableEffect('k', 22)))
                 player.k.stammax = player.k.sta
                 player.k.stamleft = player.k.stammax
                 player.k.prog = new Decimal(0)
@@ -1028,7 +1611,7 @@ addLayer("k", {
             name: "White Belt",
             fullDisplay() {
                 let req = "<h5>(Low Int) this tests my dog's patience and mars is in retrograde<br></h5>"
-                if (player.k.int.gte(2)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
+                if (player.k.int.gte(10)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
                 let hint = "<h5>(Low Wis) This will take between "+format(player.k.sta.mul(new Decimal(Math.random())))+
                 " seconds and "+format(player.k.sta.mul(new Decimal(Math.random())))+" years</h5>"
                 if (player.k.wis.gt(1)) hint = "<h5> this will take "+format(1/0.1)+" seconds</h5>"
@@ -1045,14 +1628,15 @@ addLayer("k", {
                 player.k.prog = new Decimal(0)
             },
             canComplete() {
-                return player.k.prog.gte(1)
+                return player.k.prog.gte(0.5)
             },
+            unlocked() { return !hasChallenge('k',01)},
         },
         02: {
             name: "Blue Belt",
             fullDisplay() {
                 let req = "<h5>(Low Int) this tests my dog's patience and mars is in retrograde<br></h5>"
-                if (player.k.int.gte(2)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
+                if (player.k.int.gte(100)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
                 let hint = "<h5>(Low Wis) This will take between "+format(player.k.sta.mul(new Decimal(Math.random())))+
                 " seconds and "+format(player.k.sta.mul(new Decimal(Math.random())))+" years</h5>"
                 if (player.k.wis.gt(1)) hint = "<h5> this will take "+format(100/0.1)+" seconds</h5>"
@@ -1069,14 +1653,15 @@ addLayer("k", {
                 player.k.prog = new Decimal(0)
             },
             canComplete() {
-                return player.k.prog.gte(1e2)
+                return player.k.prog.gte(1.25)
             },
+            unlocked() { return hasChallenge('k',01)&&!hasChallenge('k',02)},
         },
         03: {
             name: "Purple Belt",
             fullDisplay() {
                 let req = "<h5>(Low Int) this tests my dog's patience and mars is in retrograde<br></h5>"
-                if (player.k.int.gte(2)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
+                if (player.k.int.gte(1000)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
                 let hint = "<h5>(Low Wis) This will take between "+format(player.k.sta.mul(new Decimal(Math.random())))+
                 " seconds and "+format(player.k.sta.mul(new Decimal(Math.random())))+" years</h5>"
                 if (player.k.wis.gt(1)) hint = "<h5> this will take "+format(100000/0.1)+" seconds</h5>"
@@ -1093,14 +1678,15 @@ addLayer("k", {
                 player.k.prog = new Decimal(0)
             },
             canComplete() {
-                return player.k.prog.gte(1e5)
+                return player.k.prog.gte(3.5)
             },
+            unlocked() { return hasChallenge('k',02)&&!hasChallenge('k',03)},
         },
         04: {
             name: "Brown Belt",
             fullDisplay() {
                 let req = "<h5>(Low Int) this tests my dog's patience and mars is in retrograde<br></h5>"
-                if (player.k.int.gte(2)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
+                if (player.k.int.gte(10000)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
                 let hint = "<h5>(Low Wis) This will take between "+format(player.k.sta.mul(new Decimal(Math.random())))+
                 " seconds and "+format(player.k.sta.mul(new Decimal(Math.random())))+" years</h5>"
                 if (player.k.wis.gt(1)) hint = "<h5> this will take "+format(1000000000/0.1)+" seconds</h5>"
@@ -1117,8 +1703,66 @@ addLayer("k", {
                 player.k.prog = new Decimal(0)
             },
             canComplete() {
-                return player.k.prog.gte(1e9)
+                return player.k.prog.gte(7.5)
             },
+            unlocked() { return hasChallenge('k',03)&&!hasChallenge('k',04)},
         },
-    }
+        05: {
+            name: "Black Belt",
+            fullDisplay() {
+                let req = "<h5>(Low Int) this tests my dog's patience and mars is in retrograde<br></h5>"
+                if (player.k.int.gte(10000)) req = "<h5>this tests my stamina level since gain is static<br></h5>"
+                let hint = "<h5>(Low Wis) This will take between "+format(player.k.sta.mul(new Decimal(Math.random())))+
+                " seconds and "+format(player.k.sta.mul(new Decimal(Math.random())))+" years</h5>"
+                if (player.k.wis.gt(1)) hint = "<h5> this will take "+format(1000000000/0.1)+" seconds</h5>"
+                
+                return req+hint
+            },
+            onEnter() { 
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+            },
+            onExit() {
+                player.k.stammax = player.k.sta
+                player.k.stamleft = player.k.stammax
+                player.k.prog = new Decimal(0)
+            },
+            canComplete() {
+                return player.k.prog.gte(15)
+            },
+            unlocked() { return hasChallenge('k',04)&&!hasChallenge('k',05)},
+        },
+    },
+    milestones: {
+        1: {
+            requirementDescription: "White Belt",
+            effectDescription: "Conviction^1.1",
+            done() { return hasChallenge('k',01) },
+            unlocked() { return hasChallenge('k',01) },
+        },
+        2: {
+            requirementDescription: "Blue Belt",
+            effectDescription: "Conviction^1.2",
+            done() { return hasChallenge('k',02) },
+            unlocked() { return hasChallenge('k',02) },
+        },
+        3: {
+            requirementDescription: "Purple Belt",
+            effectDescription: "Conviction^1.3",
+            done() { return hasChallenge('k',03) },
+            unlocked() { return hasChallenge('k',03) },
+        },
+        4: {
+            requirementDescription: "Brown Belt",
+            effectDescription: "Conviction^1.4",
+            done() { return hasChallenge('k',04) },
+            unlocked() { return hasChallenge('k',04) },
+        },
+        5: {
+            requirementDescription: "Black Belt",
+            effectDescription: "Conviction^1.5",
+            done() { return hasChallenge('k',05) },
+            unlocked() { return hasChallenge('k',05) },
+        },
+    },
 })

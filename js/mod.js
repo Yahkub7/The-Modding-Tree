@@ -13,11 +13,20 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.5",
+	num: "0.0.6",
 	name: "We made the numbers do the up with time",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.6</h3><br>
+		- All Stats Implemented.<br>
+		- CON replaced by LCK.<br>
+		- Balancing needed, mostly for upgrades and stuff.<br>
+		- Releasing this as the layer is feature complete.<br>
+		- Not balance complete, feature.<br>
+		- Added: Nice.<br>
+		- To-Do: More Upgrades/Better Ones.<br>
+		- To-Do: More Belts -> Degrees -> Red Belt.<br>
 	<br><h3>v0.0.5</h3><br>
 		- "Well Ackchyually, US Census Bureau Estimates 7.942e9" ~My Brother<br>
 		- Lots and lots and lots and lots of tweaking to fix the early game softlock achievements unbalancing things.<br>
@@ -152,7 +161,7 @@ var displayThings = [
 
 // Determines when the game "ends"
 function isEndgame() {
-	return player.G.rec.gte(new Decimal("7.837e9"))
+	return hasMilestone('k',5)
 }
 
 

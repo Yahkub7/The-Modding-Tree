@@ -3,7 +3,7 @@ let modInfo = {
 	id: "cult1337",
 	author: "Neutral",
 	pointsName: "Faith",
-	modFiles: ["layers.js","tree.js","layers/test.js"],
+	modFiles: ["tree.js","layers/a.js","layers/c.js","layers/g.js","layers/k.js","layers/m.js","layers/spooky.js"],
 
 	discordName: "",
 	discordLink: "",
@@ -13,11 +13,21 @@ let modInfo = {
 
 // Set your version in num and name
 let VERSION = {
-	num: "0.0.6",
-	name: "The Stats, They Rise",
+	num: "0.0.6.9",
+	name: "Perfectly balanced, as all things should be",
 }
 
 let changelog = `<h1>Changelog:</h1><br>
+	<br><h3>v0.0.6.9</h3><br>
+		- Technical: Moved layers into separate files.<br>
+		- This whole update is balance changes.<br>
+		- Added 'm' which is just a win the game button.<br>
+		- Endgame: Updated.<br>
+		- Goals:<br>
+		- Conviction upgrades less unimportant.<br>
+		- Gold takes longer but scales better.<br>
+		- Chi unlocked earlier so it can help build the cult.<br>
+		- Chi upgrades, buyables, etc. spaced out.<br>
 	<br><h3>v0.0.6</h3><br>
 		- All Stats Implemented.<br>
 		- CON replaced by LCK.<br>
@@ -77,7 +87,7 @@ let changelog = `<h1>Changelog:</h1><br>
 		- It was too long. Way too long. I google'd it, I tried everything I could think of.<br>
 		- Then, then after a week, I had the bright idea to look at someone else's mod.<br>
 		- Why didn't I do that earlier? Cause I'm stupid.<br>
-		- This logic puzzle is going to be hard.<br>`
+		- This logic puzzle is going to be hard.<br><br><br><br>`
 
 let winText = `Congratulations! You have reached the end and beaten this game, but for now...`
 
@@ -97,25 +107,25 @@ function canGenPoints() {
 // To be used to get the base points/sec
 function getPointBase() {
 	let base = new Decimal(0.5)
-	if (hasUpgrade("C",31)) base = base.add(0.5)
+	if (hasUpgrade("c",31)) base = base.add(0.5)
 	return base
 }
 
 // To be used to get the multiplier of base points/sec
 function getPointMult() {
 	let mult = new Decimal(1)
-	mult = mult.mul(tmp.A.effect)
-	if (hasUpgrade("C",11)) mult = mult.add(1)
-	if (hasUpgrade("C",13)) mult = mult.mul(upgradeEffect("C",13))
+	mult = mult.mul(tmp.a.effect)
+	if (hasUpgrade("c",11)) mult = mult.add(1)
+	if (hasUpgrade("c",13)) mult = mult.mul(upgradeEffect("c",13))
 	return mult
 }
 
 // To be used to get the exponent of base points/sec
 function getPointExp() {
 	let exp = new Decimal(1)
-	if (hasUpgrade("C",12)) exp = exp.add(0.5)
-	if (hasUpgrade("C",22)) exp = exp.add(0.75)
-	if (hasUpgrade("C",32)) exp = exp.add(1)
+	if (hasUpgrade("c",12)) exp = exp.add(0.5)
+	if (hasUpgrade("c",22)) exp = exp.add(0.75)
+	if (hasUpgrade("c",32)) exp = exp.add(1)
 	return exp
 }
 
@@ -130,7 +140,7 @@ function getPointGen() {
 // Determines the percent of total player.points lost per second. Doesn't work very well with higher numbers, never seems to cap.
 function getDegen() {
 	let degen = new Decimal(0.20)
-	if (hasUpgrade("C",21)) degen = degen.div(2)
+	if (hasUpgrade("c",21)) degen = degen.div(2)
 	return degen
 }
 
@@ -154,14 +164,14 @@ var displayThings = [
 	function() {
 		let dis = getPointGen()
 		dis = dis.minus(player.points.mul(getDegen()))
-		dis = "("+format(dis)+") Net F/s<br>You lose " + getDegen().mul(100) + "% of your total Faith per second<br>Endgame: Recruit the World (7.837e9)"
+		dis = "("+format(dis)+") Net F/s<br>You lose " + getDegen().mul(100) + "% of your total Faith per second<br>Endgame: first M upgrade"
 		return "(" + format(getPointGen()) + ")" + " Gross F/s<br>"+dis
 	}
 ]
 
 // Determines when the game "ends"
 function isEndgame() {
-	return hasMilestone('k',5)
+	return hasUpgrade('m',11)
 }
 
 
